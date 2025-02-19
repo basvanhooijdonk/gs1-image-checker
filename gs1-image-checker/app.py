@@ -15,16 +15,19 @@ import io
 def download_image(url):
     """Download afbeelding van een URL en converteer naar een PIL-image."""
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0"  # Vermijd blokkades door servers
-        }
+        headers = {"User-Agent": "Mozilla/5.0"}
         response = requests.get(url, headers=headers, stream=True, timeout=10)
-        response.raise_for_status()  # Geeft een fout als de URL niet werkt
-        
+        response.raise_for_status()
+
+        # ✅ Controleer de content-type header
+        content_type = response.headers.get("Content-Type", "")
+        if "image" not in content_type:
+            raise ValueError(f"URL retourneert geen afbeelding, maar {content_type}")
+
         img = Image.open(io.BytesIO(response.content))
         return img
-    except requests.exceptions.RequestException as e:
-        st.error(f"Fout bij downloaden afbeelding: {e}")
+    except Exception as e:
+        print(f"Fout bij downloaden afbeelding: {e}")
         return None
 
 def check_resolution(image):
