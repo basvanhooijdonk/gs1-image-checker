@@ -8,13 +8,23 @@ from PIL import Image
 # Instellingen voor OCR
 pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Pas aan als nodig
 
+import requests
+from PIL import Image
+import io
+
 def download_image(url):
-    """Download afbeelding via URL."""
+    """Download afbeelding van een URL en converteer naar een PIL-image."""
     try:
-        response = requests.get(url, stream=True)
-        if response.status_code == 200:
-            return Image.open(response.raw)
-    except:
+        headers = {
+            "User-Agent": "Mozilla/5.0"  # Vermijd blokkades door servers
+        }
+        response = requests.get(url, headers=headers, stream=True, timeout=10)
+        response.raise_for_status()  # Geeft een fout als de URL niet werkt
+        
+        img = Image.open(io.BytesIO(response.content))
+        return img
+    except requests.exceptions.RequestException as e:
+        st.error(f"Fout bij downloaden afbeelding: {e}")
         return None
 
 def check_resolution(image):
