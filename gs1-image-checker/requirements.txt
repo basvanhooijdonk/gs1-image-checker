@@ -1,0 +1,6 @@
+streamlit
+opencv-python-headless  # Gebruik de headless versie voor compatibiliteit
+numpy
+pillow
+pytesseract
+requests
